@@ -4,17 +4,18 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import com.appsflyer.resolver.AFHttp
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        AFHttp.debug = true
-        AFHttp.init(this)
-        AFHttp.resolveDeepLinkValue("dfcd"){ res ->
-            res?.let {
-                Log.d("TAG", "onCreate: $it")
-            }
-        }
+       runBlocking {
+           AFHttp()
+               .resolveDeepLinkValue("dfcd")
+               }
+
+        val a = AFHttp().resolveDeepLinkValueSync("d",5)
+       }
+
     }
-}
