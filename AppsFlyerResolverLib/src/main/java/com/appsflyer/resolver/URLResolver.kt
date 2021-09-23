@@ -1,23 +1,21 @@
 package com.appsflyer.resolver
 
 import android.util.Log
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 
-class AFHttp {
+class URLResolver(var debug: Boolean) {
+    constructor() : this(false)
 
     init {
         CookieHandler.setDefault(CookieManager())
     }
 
-    suspend fun resolveDeepLinkValue(
+    suspend fun resolve(
         url: String?,
         maxRedirections: Int = 10,
     ): String? {
@@ -32,7 +30,7 @@ class AFHttp {
             var res: AFHttpResponse? = null
             for (i in 0 until maxRedirections) {
                 // resolve current URL - check for redirection
-                res = resolve(redirects.last())
+                res = resolveInternal(redirects.last())
                 res.redirected?.let { // if redirected to another URL
                     redirects.add(it)
                 } ?: break
@@ -48,7 +46,7 @@ class AFHttp {
 
     }
 
-    private fun resolve(uri: String): AFHttpResponse {
+    private fun resolveInternal(uri: String): AFHttpResponse {
         val res = AFHttpResponse()
         try {
             (URL(uri).openConnection() as HttpURLConnection).run {
@@ -71,11 +69,13 @@ class AFHttp {
         return res
     }
 
-    fun resolveDeepLinkValueSync(url: String?,
-                maxRedirections: Int = 10,)  = runBlocking { resolveDeepLinkValue(url,maxRedirections) }
+    fun resolveSync(
+        url: String?,
+        maxRedirections: Int = 10,
+    ) = runBlocking { resolve(url, maxRedirections) }
 
     private fun afDebugLog(msg: String) {
-        if (BuildConfig.DEBUG) Log.d("AppsFlyer_Resolver", msg)
+        if (debug) Log.d("AppsFlyer_Resolver", msg)
     }
 
     private fun afErrorLog(msg: String?, e: Throwable) {
@@ -85,7 +85,7 @@ class AFHttp {
 
     private fun String.isValidURL(): Boolean {
         val regex =
-            Regex("^(http|https)://(\\w+:{0,1}\\w*@)?(\\S+)(:[0-9]+)?(/|/([\\w#!:.?+=&%@!\\-/]))?")
+            Regex("^(http|https)://(\\w+:{0,1}\\w*@)?(\\S+)(:[0-9]+)?(/|/([\\w#!:.?+=&%@\\-/]))?")
         return regex.matches(this)
     }
 }
