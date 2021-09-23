@@ -12,18 +12,13 @@ import org.junit.runner.RunWith;
 public class UrlResolverJavaTest {
     @Test
     public  void testResolveUsingBitlyAndLambda(){
-        AFHttp.INSTANCE.resolveDeepLinkValue("https://bit.ly/38JtcFq", 5 ,
-                deepLinkValue -> assertEquals(deepLinkValue , "https://paz.onelink.me/waF3/paz"));
+       String res =  new AFHttp().resolveDeepLinkValueSync("https://bit.ly/38JtcFq", 5 );
+                assertEquals(res , "https://paz.onelink.me/waF3/paz");
     }
 
     @Test
     public void testResolveUsingBitlyAndCallback(){
-        AFHttp.INSTANCE.resolveDeepLinkValue("https://bit.ly/38JtcFq", 5, new AFResolverListener() {
-            @Override
-            public void onDeepLinkValueResolved( String deepLinkValue) {
-                assertEquals(deepLinkValue , "https://paz.onelink.me/waF3/paz");
-
-            }
-        });
+        String res =  new AFHttp().resolveDeepLinkValueSync("https://bit.ly/38JtcFq", 5 );
+        assertEquals(res , "https://paz.onelink.me/waF3/paz");
     }
 }

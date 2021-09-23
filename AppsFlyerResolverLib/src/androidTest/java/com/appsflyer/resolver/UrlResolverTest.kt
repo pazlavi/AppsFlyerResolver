@@ -33,9 +33,10 @@ class UrlResolverTest {
 
     @Test
     fun  testResolveUsingBitlyAndCallback(){
-        runBlocking{
-            val res =  AFHttp().resolveDeepLinkValue("https://bit.ly/38JtcFq", 5)
+          runBlocking{
+              val res = AFHttp().resolveDeepLinkValue("https://bit.ly/38JtcFq", 5)
             assertEquals(res , "https://paz.onelink.me/waF3/paz")
+
         }
 
 
